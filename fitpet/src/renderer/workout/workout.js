@@ -91,9 +91,12 @@ function startDetectionLoop() {
   function loop() {
     if (!loopRunning) return;
 
-    if (video.videoWidth > 0) {
-      canvas.width  = video.videoWidth;
-      canvas.height = video.videoHeight;
+    // 用显示尺寸而非原始分辨率，避免 object-fit:cover 导致坐标偏移
+    const displayW = video.clientWidth  || video.offsetWidth;
+    const displayH = video.clientHeight || video.offsetHeight;
+    if (displayW > 0 && displayH > 0) {
+      canvas.width  = displayW;
+      canvas.height = displayH;
     }
 
     const landmarks = poseLandmarker ? detectPose(poseLandmarker, video, performance.now()) : null;
