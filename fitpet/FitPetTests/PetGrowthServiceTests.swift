@@ -1,6 +1,7 @@
 import XCTest
 @testable import FitPet
 
+@MainActor
 final class PetGrowthServiceTests: XCTestCase {
     func test_realmCalculation() {
         XCTAssertEqual(PetGrowthService.realm(for: 1),  1)
