@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import Combine
 
 struct WorkoutView: View {
     @Environment(\.dismiss) private var dismiss
@@ -92,7 +93,7 @@ struct WorkoutView: View {
             kegelTimer?.invalidate()
             kegelTimer = nil
         }
-        .onChange(of: poseDetector.landmarks) { _, lm in
+        .onReceive(poseDetector.$landmarks) { lm in
             guard !lm.isEmpty else { return }
             classifier.update(landmarks: lm)
             updateCounters(landmarks: lm)
