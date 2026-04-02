@@ -41,7 +41,7 @@ async function init() {
     console.warn('无法从DB获取计划，使用默认值');
   }
 
-  plans = dbPlans || [
+  plans = (dbPlans && dbPlans.length > 0) ? dbPlans : [
     { exercise: 'pushup',      sets: 3, reps: 15,   duration_seconds: null },
     { exercise: 'squat',       sets: 3, reps: 20,   duration_seconds: null },
     { exercise: 'zhan_zhuang', sets: 1, reps: null,  duration_seconds: 300 },
