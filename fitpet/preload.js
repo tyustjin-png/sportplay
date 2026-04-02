@@ -10,4 +10,5 @@ contextBridge.exposeInMainWorld('fitpet', {
     ipcRenderer.removeAllListeners('pet-update');
     ipcRenderer.on('pet-update', (_e, data) => callback(data));
   },
+  getWorkoutPlans: () => ipcRenderer.invoke('get-workout-plans'),
 });
