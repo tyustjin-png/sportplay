@@ -87,7 +87,11 @@ struct WorkoutView: View {
             }
         }
         .onAppear  { poseDetector.startSession() }
-        .onDisappear { poseDetector.stopSession() }
+        .onDisappear {
+            poseDetector.stopSession()
+            kegelTimer?.invalidate()
+            kegelTimer = nil
+        }
         .onChange(of: poseDetector.landmarks) { _, lm in
             guard !lm.isEmpty else { return }
             classifier.update(landmarks: lm)
@@ -137,6 +141,13 @@ struct WorkoutView: View {
     }
 
     private func completeSet() {
+        // 站桩需要至少完成目标时长的 80% 才能算完成
+        if currentExercise == .zhanZhuang {
+            let plan = plans.first(where: { $0.exercise == "zhan_zhuang" })
+            let targetSeconds = Double(plan?.durationSeconds ?? 300)
+            guard zhanTimer.elapsedSeconds >= targetSeconds * 0.8 else { return }
+        }
+
         let exercise = currentExercise.rawValue
         guard exercise != "unknown", exercise != "kegel" else { return }
 

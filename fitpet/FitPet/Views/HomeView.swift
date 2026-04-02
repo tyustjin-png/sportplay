@@ -39,6 +39,42 @@ struct HomeView: View {
         PetGrowthService.mood(completionRate: completionRate, daysSinceActive: daysSinceActive)
     }
 
+    private func updatePetAfterWorkout() {
+        let state = petState
+        let rate = WorkoutService.completionRate(sessions: sessions, plans: plans, date: today)
+        let highDays = WorkoutService.consecutiveHighDays(summaries: Array(summaries), before: today)
+        let newLvl = PetGrowthService.newLevel(
+            currentLevel: state.currentLevel,
+            completionRate: rate,
+            consecutiveHighDays: highDays
+        )
+
+        // 连续打卡计算
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())
+        let fmt = DateFormatter(); fmt.dateFormat = "yyyy-MM-dd"
+        let yesterdayStr = yesterday.map { fmt.string(from: $0) } ?? ""
+        let newStreak: Int
+        if state.lastActiveDate == yesterdayStr {
+            newStreak = state.streakDays + 1
+        } else if state.lastActiveDate == today {
+            newStreak = state.streakDays
+        } else {
+            newStreak = 1
+        }
+
+        state.currentRealm = PetGrowthService.realm(for: newLvl)
+        state.currentLevel = newLvl
+        state.streakDays = newStreak
+        state.lastActiveDate = today
+
+        // 保存每日汇总
+        if summaries.first(where: { $0.date == today }) == nil {
+            let summary = DailySummary(date: today, completionRate: rate, streakDays: newStreak)
+            context.insert(summary)
+        }
+        try? context.save()
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -89,7 +125,7 @@ struct HomeView: View {
             }
             .navigationTitle("FitPet")
         }
-        .fullScreenCover(isPresented: $showWorkout) {
+        .fullScreenCover(isPresented: $showWorkout, onDismiss: updatePetAfterWorkout) {
             WorkoutView()
         }
         .onAppear {
