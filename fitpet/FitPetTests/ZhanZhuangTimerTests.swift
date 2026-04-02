@@ -20,7 +20,7 @@ final class ZhanZhuangTimerTests: XCTestCase {
         timer.update(landmarks: validLandmarks(), now: now.addingTimeInterval(1))
         timer.update(landmarks: validLandmarks(), now: now.addingTimeInterval(2))
 
-        XCTAssertGreater(timer.elapsedSeconds, 1.5)
+        XCTAssertGreaterThan(timer.elapsedSeconds, 1.5)
     }
 
     func test_stopsWhenPoseInvalid() {
