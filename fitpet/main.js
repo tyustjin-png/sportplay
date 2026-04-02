@@ -1,6 +1,11 @@
 // main.js — Electron 主进程：双窗口 + DB 集成 + IPC 处理
-const { app, BrowserWindow, ipcMain, screen } = require('electron');
-const path = require('path');
+import { app, BrowserWindow, ipcMain, screen } from 'electron';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// ESM 中没有 __dirname，需要手动构造
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 let workoutWindow = null;
 let petWindow = null;
@@ -24,7 +29,7 @@ function createPetWindow() {
     skipTaskbar: true,
     hasShadow: false,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
     },
@@ -41,7 +46,7 @@ function createWorkoutWindow() {
     height: 720,
     show: false,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
     },
