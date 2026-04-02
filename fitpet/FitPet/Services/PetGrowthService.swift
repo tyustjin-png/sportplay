@@ -1,5 +1,13 @@
 import Foundation
 
+enum DragonForm: Equatable {
+    case egg, hatchling, young, divine
+}
+
+enum PetMood: Equatable {
+    case happy, neutral, sad
+}
+
 struct PetGrowthService {
     static let levelsPerRealm = 27
 
@@ -30,13 +38,6 @@ struct PetGrowthService {
         return max(newLevel, 1)
     }
 
-    enum DragonForm: Equatable {
-        case egg
-        case hatchling
-        case young
-        case divine
-    }
-
     static func dragonForm(for level: Int) -> DragonForm {
         switch realm(for: level) {
         case 1:  return .egg
@@ -45,8 +46,6 @@ struct PetGrowthService {
         default: return .divine
         }
     }
-
-    enum PetMood: Equatable { case happy, neutral, sad }
 
     static func mood(completionRate: Double, daysSinceActive: Int) -> PetMood {
         if daysSinceActive >= 3 { return .sad }

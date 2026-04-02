@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct DragonView: View {
-    let form: PetGrowthService.DragonForm
-    let mood: PetGrowthService.PetMood
+    let form: DragonForm
+    let mood: PetMood
     let isWorkingOut: Bool
 
     @State private var breathScale: CGFloat = 1.0
@@ -51,7 +51,7 @@ struct DragonView: View {
 }
 
 struct EggShape: View {
-    let mood: PetGrowthService.PetMood
+    let mood: PetMood
 
     var body: some View {
         ZStack {
@@ -83,7 +83,7 @@ struct EggShape: View {
 }
 
 struct HatchlingShape: View {
-    let mood: PetGrowthService.PetMood
+    let mood: PetMood
 
     var body: some View {
         ZStack {
@@ -119,7 +119,7 @@ struct HatchlingShape: View {
 }
 
 struct YoungDragonShape: View {
-    let mood: PetGrowthService.PetMood
+    let mood: PetMood
 
     var body: some View {
         ZStack {
@@ -162,7 +162,7 @@ struct YoungDragonShape: View {
 }
 
 struct DivineDragonShape: View {
-    let mood: PetGrowthService.PetMood
+    let mood: PetMood
     @State private var glowRadius: CGFloat = 8
 
     var body: some View {

@@ -23,7 +23,7 @@ struct HomeView: View {
         WorkoutService.completionRate(sessions: sessions, plans: plans, date: today)
     }
 
-    private var dragonForm: PetGrowthService.DragonForm {
+    private var dragonForm: DragonForm {
         PetGrowthService.dragonForm(for: petState.currentLevel)
     }
 
@@ -35,7 +35,7 @@ struct HomeView: View {
         return Calendar.current.dateComponents([.day], from: last, to: todayDate).day ?? 0
     }
 
-    private var mood: PetGrowthService.PetMood {
+    private var mood: PetMood {
         PetGrowthService.mood(completionRate: completionRate, daysSinceActive: daysSinceActive)
     }
 
