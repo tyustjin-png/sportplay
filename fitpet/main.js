@@ -44,6 +44,12 @@ function createWorkoutWindow() {
   });
 
   workoutWindow.loadFile('src/renderer/workout/index.html');
+
+  // 页面加载完成后才显示，避免白屏
+  workoutWindow.once('ready-to-show', () => {
+    workoutWindow.show();
+  });
+
   workoutWindow.on('closed', () => { workoutWindow = null; });
 }
 
@@ -53,9 +59,12 @@ app.whenReady().then(() => {
 });
 
 ipcMain.on('show-workout', () => {
-  if (!workoutWindow) createWorkoutWindow();
-  workoutWindow.show();
-  workoutWindow.focus();
+  if (!workoutWindow) {
+    createWorkoutWindow();  // 内部会处理 ready-to-show 后显示
+  } else {
+    workoutWindow.show();
+    workoutWindow.focus();
+  }
 });
 
 ipcMain.on('workout-completed', (_event, data) => {
@@ -72,4 +81,10 @@ ipcMain.on('set-ignore-mouse', (_event, ignore) => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
+});
+
+// macOS：点击 Dock 图标时重新创建窗口
+app.on('activate', () => {
+  if (!petWindow) createPetWindow();
+  if (!workoutWindow) createWorkoutWindow();
 });
