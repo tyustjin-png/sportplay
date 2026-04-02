@@ -7,7 +7,7 @@
  * @param {string} [wasmPath] - WASM 文件目录，默认使用 CDN
  */
 export async function initPoseDetector(wasmPath) {
-  const { PoseLandmarker, FilesetResolver } = await import('@mediapipe/tasks-vision');
+  const { PoseLandmarker, FilesetResolver } = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs');
 
   const vision = await FilesetResolver.forVisionTasks(
     wasmPath || 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm'
