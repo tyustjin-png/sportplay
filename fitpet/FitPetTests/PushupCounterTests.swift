@@ -4,7 +4,7 @@ import XCTest
 final class PushupCounterTests: XCTestCase {
     private func landmarks(elbowAngle: Double) -> [String: (point: CGPoint, confidence: Float)] {
         let rad = elbowAngle * .pi / 180
-        let wristX = 1 + cos(rad)
+        let wristX = 1 - cos(rad)
         let wristY = sin(rad)
         let pt: (CGPoint, Float) -> (point: CGPoint, confidence: Float) = { ($0, $1) }
         return [

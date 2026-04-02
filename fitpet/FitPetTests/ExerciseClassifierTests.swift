@@ -7,9 +7,9 @@ final class ExerciseClassifierTests: XCTestCase {
     }
 
     private var uprightLandmarks: [String: (point: CGPoint, confidence: Float)] {
-        ["leftShoulder": pt(0.5, 0.8), "leftHip": pt(0.5, 0.5), "leftAnkle": pt(0.5, 0.1),
-         "leftKnee": pt(0.5, 0.3), "rightShoulder": pt(0.6, 0.8), "rightHip": pt(0.6, 0.5),
-         "rightKnee": pt(0.6, 0.3), "rightAnkle": pt(0.6, 0.1), "nose": pt(0.5, 0.9)]
+        ["leftShoulder": pt(0.5, 0.2), "leftHip": pt(0.5, 0.5), "leftAnkle": pt(0.5, 0.9),
+         "leftKnee": pt(0.5, 0.7), "rightShoulder": pt(0.6, 0.2), "rightHip": pt(0.6, 0.5),
+         "rightKnee": pt(0.6, 0.7), "rightAnkle": pt(0.6, 0.9), "nose": pt(0.5, 0.1)]
     }
 
     private var proneLandmarks: [String: (point: CGPoint, confidence: Float)] {
@@ -38,9 +38,9 @@ final class ExerciseClassifierTests: XCTestCase {
         var classifier = ExerciseClassifier()
         classifier.confirmationFrames = 1
         var lm = uprightLandmarks
-        lm["leftKnee"]  = pt(0.5, 0.2)
-        lm["leftHip"]   = pt(0.5, 0.4)
-        lm["leftAnkle"] = pt(0.5, 0.1)
+        lm["leftHip"]   = pt(0.4, 0.4)
+        lm["leftKnee"]  = pt(0.5, 0.6)
+        lm["leftAnkle"] = pt(0.4, 0.8)
         classifier.update(landmarks: lm)
         XCTAssertEqual(classifier.currentExercise, .squat)
     }

@@ -30,7 +30,7 @@ struct PetGrowthService {
         return max(newLevel, 1)
     }
 
-    enum DragonForm {
+    enum DragonForm: Equatable {
         case egg
         case hatchling
         case young
@@ -46,7 +46,7 @@ struct PetGrowthService {
         }
     }
 
-    enum PetMood { case happy, neutral, sad }
+    enum PetMood: Equatable { case happy, neutral, sad }
 
     static func mood(completionRate: Double, daysSinceActive: Int) -> PetMood {
         if daysSinceActive >= 3 { return .sad }

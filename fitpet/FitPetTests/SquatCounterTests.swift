@@ -4,7 +4,7 @@ import XCTest
 final class SquatCounterTests: XCTestCase {
     private func landmarks(kneeAngle: Double) -> [String: (point: CGPoint, confidence: Float)] {
         let rad = kneeAngle * .pi / 180
-        let ankleX = 1 + cos(rad)
+        let ankleX = 1 - cos(rad)
         let ankleY = sin(rad)
         let pt: (CGPoint, Float) -> (point: CGPoint, confidence: Float) = { ($0, $1) }
         return [
