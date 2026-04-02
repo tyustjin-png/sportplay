@@ -1,6 +1,7 @@
 {
   "name": "fitpet",
   "version": "0.1.0",
+  "type": "module",
   "description": "运动检测 + 桌面宠物成长系统",
   "main": "main.js",
   "scripts": {
