@@ -20,6 +20,9 @@ export function createPushupCounter() {
 
   function update(landmarks) {
     if (!landmarks) return;
+    // 关键点可见度不足时跳过，避免噪声误计
+    const pts = [LEFT_SHOULDER, LEFT_ELBOW, LEFT_WRIST, RIGHT_SHOULDER, RIGHT_ELBOW, RIGHT_WRIST];
+    if (pts.some(i => (landmarks[i]?.visibility ?? 0) < 0.6)) return;
     const leftAngle  = calcAngle(landmarks[LEFT_SHOULDER],  landmarks[LEFT_ELBOW],  landmarks[LEFT_WRIST]);
     const rightAngle = calcAngle(landmarks[RIGHT_SHOULDER], landmarks[RIGHT_ELBOW], landmarks[RIGHT_WRIST]);
     const avgAngle = (leftAngle + rightAngle) / 2;

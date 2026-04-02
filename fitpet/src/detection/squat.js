@@ -17,6 +17,8 @@ export function createSquatCounter() {
 
   function update(landmarks) {
     if (!landmarks) return;
+    const pts = [LEFT_HIP, LEFT_KNEE, LEFT_ANKLE, RIGHT_HIP, RIGHT_KNEE, RIGHT_ANKLE];
+    if (pts.some(i => (landmarks[i]?.visibility ?? 0) < 0.6)) return;
     const leftAngle  = calcAngle(landmarks[LEFT_HIP],  landmarks[LEFT_KNEE],  landmarks[LEFT_ANKLE]);
     const rightAngle = calcAngle(landmarks[RIGHT_HIP], landmarks[RIGHT_KNEE], landmarks[RIGHT_ANKLE]);
     const avgAngle = (leftAngle + rightAngle) / 2;
