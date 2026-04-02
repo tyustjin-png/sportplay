@@ -25,12 +25,12 @@ struct ExerciseClassifier {
 
         if detected == candidateExercise {
             candidateCount += 1
-            if candidateCount >= confirmationFrames {
-                currentExercise = candidateExercise
-            }
         } else {
             candidateExercise = detected
             candidateCount = 1
+        }
+        if candidateCount >= confirmationFrames {
+            currentExercise = candidateExercise
         }
     }
 
