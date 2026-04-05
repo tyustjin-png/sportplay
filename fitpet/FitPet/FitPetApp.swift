@@ -12,6 +12,6 @@ struct FitPetApp: App {
             DailySession.self,
             PetState.self,
             DailySummary.self,
-        ])
+        ], isAutosaveEnabled: true)
     }
 }
