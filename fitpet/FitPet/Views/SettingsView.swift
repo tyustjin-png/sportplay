@@ -23,6 +23,9 @@ struct SettingsView: View {
             }
             .navigationTitle("目标设置")
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                if plans.isEmpty { WorkoutService.seedDefaultPlans(context: context) }
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("完成") { dismiss() }
