@@ -52,34 +52,133 @@ struct DragonView: View {
 
 struct EggShape: View {
     let mood: PetMood
+    @State private var shimmer: CGFloat = -1.0
 
     var body: some View {
         ZStack {
+            // 底层渐变蛋壳
             Ellipse()
-                .fill(moodGradient)
+                .fill(baseGradient)
                 .frame(width: 100, height: 120)
-            Path { p in
-                p.move(to: CGPoint(x: 50, y: 20))
-                p.addLine(to: CGPoint(x: 45, y: 50))
-                p.addLine(to: CGPoint(x: 55, y: 70))
-            }
-            .stroke(Color.white.opacity(0.6), lineWidth: 2)
-            .frame(width: 100, height: 120)
+
+            // 光泽层
+            Ellipse()
+                .fill(
+                    LinearGradient(
+                        colors: [Color.white.opacity(0.5), Color.clear],
+                        startPoint: .init(x: 0.2, y: 0.0),
+                        endPoint: .init(x: 0.6, y: 0.5)
+                    )
+                )
+                .frame(width: 100, height: 120)
+
+            // 鳞片纹路
+            EggScalePattern(colors: scaleColors)
+                .frame(width: 100, height: 120)
+                .clipShape(Ellipse())
+                .opacity(0.45)
+
+            // 流光扫过
+            Ellipse()
+                .fill(
+                    LinearGradient(
+                        colors: [Color.clear, Color.white.opacity(0.6), Color.clear],
+                        startPoint: .init(x: shimmer, y: 0),
+                        endPoint: .init(x: shimmer + 0.4, y: 1)
+                    )
+                )
+                .frame(width: 100, height: 120)
+                .blendMode(.screen)
+
+            // 眼睛
             HStack(spacing: 14) {
-                Circle().fill(Color.white).frame(width: 12, height: 12)
-                Circle().fill(Color.white).frame(width: 12, height: 12)
+                Circle().fill(Color.white).frame(width: 10, height: 10)
+                    .overlay(Circle().fill(eyeColor).frame(width: 5, height: 5))
+                Circle().fill(Color.white).frame(width: 10, height: 10)
+                    .overlay(Circle().fill(eyeColor).frame(width: 5, height: 5))
             }
-            .offset(y: 10)
+            .offset(y: 12)
+        }
+        .onAppear {
+            withAnimation(.linear(duration: 2.5).repeatForever(autoreverses: false)) {
+                shimmer = 1.2
+            }
         }
     }
 
-    private var moodGradient: LinearGradient {
+    private var baseGradient: LinearGradient {
         switch mood {
-        case .happy:   return LinearGradient(colors: [.green, .teal],  startPoint: .top, endPoint: .bottom)
-        case .neutral: return LinearGradient(colors: [.blue, .indigo], startPoint: .top, endPoint: .bottom)
-        case .sad:     return LinearGradient(colors: [.gray, .gray.opacity(0.6)], startPoint: .top, endPoint: .bottom)
+        case .happy:
+            return LinearGradient(
+                colors: [Color(red:0.2,green:0.9,blue:0.6), Color(red:0.0,green:0.6,blue:0.8), Color(red:0.4,green:0.2,blue:0.9)],
+                startPoint: .topLeading, endPoint: .bottomTrailing)
+        case .neutral:
+            return LinearGradient(
+                colors: [Color(red:0.4,green:0.5,blue:1.0), Color(red:0.2,green:0.3,blue:0.8), Color(red:0.6,green:0.3,blue:0.9)],
+                startPoint: .topLeading, endPoint: .bottomTrailing)
+        case .sad:
+            return LinearGradient(
+                colors: [Color(red:0.5,green:0.5,blue:0.6), Color(red:0.3,green:0.3,blue:0.4)],
+                startPoint: .top, endPoint: .bottom)
         }
     }
+
+    private var scaleColors: [Color] {
+        switch mood {
+        case .happy:   return [.cyan, .green, .teal]
+        case .neutral: return [.blue, .purple, .indigo]
+        case .sad:     return [.gray, .gray.opacity(0.5)]
+        }
+    }
+
+    private var eyeColor: Color {
+        switch mood {
+        case .happy:   return .green
+        case .neutral: return .blue
+        case .sad:     return .gray
+        }
+    }
+}
+
+/// 蛋壳鳞片纹路
+struct EggScalePattern: View {
+    let colors: [Color]
+
+    var body: some View {
+        Canvas { ctx, size in
+            let rows = 7
+            let cols = 5
+            let w = size.width / CGFloat(cols)
+            let h = size.height / CGFloat(rows)
+
+            for row in 0..<rows {
+                for col in 0..<cols {
+                    let offsetX = row % 2 == 0 ? 0.0 : w / 2
+                    let x = CGFloat(col) * w + offsetX
+                    let y = CGFloat(row) * h
+                    let color = colors[(row + col) % colors.count]
+
+                    var path = Path()
+                    path.move(to: CGPoint(x: x + w / 2, y: y))
+                    path.addQuadCurve(
+                        to: CGPoint(x: x + w, y: y + h * 0.6),
+                        control: CGPoint(x: x + w * 1.1, y: y + h * 0.2))
+                    path.addQuadCurve(
+                        to: CGPoint(x: x + w / 2, y: y + h * 0.85),
+                        control: CGPoint(x: x + w * 0.9, y: y + h))
+                    path.addQuadCurve(
+                        to: CGPoint(x: x, y: y + h * 0.6),
+                        control: CGPoint(x: x - w * 0.1, y: y + h))
+                    path.addQuadCurve(
+                        to: CGPoint(x: x + w / 2, y: y),
+                        control: CGPoint(x: x - w * 0.1, y: y + h * 0.2))
+
+                    ctx.stroke(path, with: .color(color), lineWidth: 1.2)
+                }
+            }
+        }
+    }
+}
 }
 
 struct HatchlingShape: View {
