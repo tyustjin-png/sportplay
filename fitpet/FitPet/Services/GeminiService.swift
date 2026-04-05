@@ -43,7 +43,11 @@ struct GeminiService {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
-        let (data, _) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+        let responseStr = String(data: data, encoding: .utf8) ?? "nil"
+        print("=== Gemini API status: \(statusCode) ===")
+        print(responseStr)
         return try parseResponse(data)
     }
 
