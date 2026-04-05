@@ -150,9 +150,12 @@ struct DragonChatView: View {
         guard let state = petState else { return }
         let rate = WorkoutService.completionRate(sessions: sessions, plans: plans, date: today)
         let highDays = WorkoutService.consecutiveHighDays(summaries: Array(summaries), before: today)
-        let newLvl = PetGrowthService.newLevel(
-            currentLevel: state.currentLevel,
+        let exerciseTypes = Set(sessions.filter { $0.date == today && $0.completedSets > 0 }.map { $0.exercise }).count
+
+        let result = PetGrowthService.processEndOfDay(
+            state: state,
             completionRate: rate,
+            completedExerciseTypes: exerciseTypes,
             consecutiveHighDays: highDays
         )
 
@@ -164,12 +167,15 @@ struct DragonChatView: View {
             state.streakDays = 1
         }
 
-        state.currentLevel = newLvl
-        state.currentRealm = PetGrowthService.realm(for: newLvl)
+        state.currentLevel = result.newLevel
+        state.currentRealm = result.newRealm
+        state.currentExp = result.remainingExp
+        state.totalExp += result.expEarned
         state.lastActiveDate = today
 
         if summaries.first(where: { $0.date == today }) == nil {
-            let summary = DailySummary(date: today, completionRate: rate, streakDays: state.streakDays)
+            let summary = DailySummary(date: today, completionRate: rate, streakDays: state.streakDays,
+                                       expEarned: result.expEarned, isBurstDay: result.isBurstDay, isResonance: result.isResonance)
             context.insert(summary)
         }
         try? context.save()
