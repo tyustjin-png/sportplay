@@ -24,10 +24,14 @@ struct DragonView: View {
     @ViewBuilder
     private var dragonShape: some View {
         switch form {
-        case .egg:       EggShape(mood: mood)
-        case .hatchling: HatchlingShape(mood: mood)
-        case .young:     YoungDragonShape(mood: mood)
-        case .divine:    DivineDragonShape(mood: mood)
+        case .dormantEgg:   EggShape(mood: mood, cracked: false)
+        case .crackingEgg:  EggShape(mood: mood, cracked: true)
+        case .hatchling:    HatchlingShape(mood: mood)
+        case .windDrake:    WindDrakeShape(mood: mood)
+        case .scaledDragon: YoungDragonShape(mood: mood)
+        case .coreDragon:   CoreDragonShape(mood: mood)
+        case .stormDragon:  StormDragonShape(mood: mood)
+        case .celestial:    DivineDragonShape(mood: mood)
         }
     }
 
@@ -52,6 +56,7 @@ struct DragonView: View {
 
 struct EggShape: View {
     let mood: PetMood
+    var cracked: Bool = false
     @State private var shimmer: CGFloat = -1.0
 
     var body: some View {
@@ -248,15 +253,16 @@ struct YoungDragonShape: View {
     }
 
     private var dragonEye: some View {
-        Circle().fill(Color.white).frame(width: 14, height: 14)
-            .overlay(Circle().fill(mood == .happy ? Color.green : Color.blue).frame(width: 8, height: 8))
+        let eyeColor: Color = (mood == .happy || mood == .ecstatic) ? .green : .blue
+        return Circle().fill(Color.white).frame(width: 14, height: 14)
+            .overlay(Circle().fill(eyeColor).frame(width: 8, height: 8))
     }
 
     private var bodyGradient: LinearGradient {
         LinearGradient(colors: [Color(red:0.1,green:0.7,blue:0.5), Color(red:0.0,green:0.5,blue:0.3)], startPoint: .top, endPoint: .bottom)
     }
 
-    private var wingColor: Color { mood == .sad ? .gray : Color(red:0.2, green:0.8, blue:0.6) }
+    private var wingColor: Color { (mood == .sad || mood == .dormant) ? .gray : Color(red:0.2, green:0.8, blue:0.6) }
 }
 
 struct DivineDragonShape: View {
@@ -326,12 +332,196 @@ struct WingShape: Shape {
     }
 }
 
+// MARK: - 腾云境：云翔幼龙
+struct WindDrakeShape: View {
+    let mood: PetMood
+    @State private var cloudOffset: CGFloat = 0
+
+    var body: some View {
+        ZStack {
+            // 云雾底部
+            Ellipse()
+                .fill(Color.white.opacity(0.5))
+                .frame(width: 90, height: 20)
+                .blur(radius: 6)
+                .offset(y: 45)
+                .offset(x: cloudOffset)
+
+            // 翅膀
+            WingShape().fill(Color.cyan.opacity(0.6))
+                .frame(width: 55, height: 40)
+                .offset(x: -50, y: -5)
+                .rotationEffect(.degrees(-15), anchor: .trailing)
+            WingShape().fill(Color.cyan.opacity(0.6))
+                .frame(width: 55, height: 40)
+                .offset(x: 50, y: -5)
+                .scaleEffect(x: -1)
+                .rotationEffect(.degrees(15), anchor: .leading)
+
+            // 身体
+            Ellipse()
+                .fill(LinearGradient(colors: [.cyan, .teal], startPoint: .top, endPoint: .bottom))
+                .frame(width: 65, height: 80)
+            Circle()
+                .fill(LinearGradient(colors: [.cyan, .teal], startPoint: .top, endPoint: .bottom))
+                .frame(width: 52, height: 52)
+                .offset(y: -48)
+
+            // 眼睛
+            HStack(spacing: 10) {
+                Circle().fill(Color.white).frame(width: 13, height: 13)
+                    .overlay(Circle().fill(mood == .happy ? Color.cyan : Color.blue).frame(width: 7, height: 7))
+                Circle().fill(Color.white).frame(width: 13, height: 13)
+                    .overlay(Circle().fill(mood == .happy ? Color.cyan : Color.blue).frame(width: 7, height: 7))
+            }.offset(y: -50)
+        }
+        .onAppear {
+            withAnimation(.easeInOut(duration: 2).repeatForever(autoreverses: true)) {
+                cloudOffset = 8
+            }
+        }
+    }
+}
+
+// MARK: - 凝丹境：丹心龙
+struct CoreDragonShape: View {
+    let mood: PetMood
+    @State private var coreGlow: CGFloat = 6
+
+    var body: some View {
+        ZStack {
+            // 光环
+            Circle()
+                .stroke(Color.orange.opacity(0.4), lineWidth: 3)
+                .frame(width: 120, height: 120)
+                .blur(radius: coreGlow * 0.5)
+
+            // 翅膀
+            WingShape().fill(Color(red:0.1,green:0.6,blue:0.4).opacity(0.8))
+                .frame(width: 60, height: 48)
+                .offset(x: -55, y: -8)
+                .rotationEffect(.degrees(-20), anchor: .trailing)
+            WingShape().fill(Color(red:0.1,green:0.6,blue:0.4).opacity(0.8))
+                .frame(width: 60, height: 48)
+                .offset(x: 55, y: -8)
+                .scaleEffect(x: -1)
+                .rotationEffect(.degrees(20), anchor: .leading)
+
+            // 身体
+            Ellipse()
+                .fill(LinearGradient(colors: [Color(red:0.1,green:0.7,blue:0.5), Color(red:0.0,green:0.4,blue:0.3)], startPoint: .top, endPoint: .bottom))
+                .frame(width: 72, height: 88)
+            Circle()
+                .fill(LinearGradient(colors: [Color(red:0.1,green:0.7,blue:0.5), Color(red:0.0,green:0.4,blue:0.3)], startPoint: .top, endPoint: .bottom))
+                .frame(width: 56, height: 56)
+                .offset(y: -56)
+
+            // 龙丹（胸口发光）
+            Circle()
+                .fill(Color.orange)
+                .frame(width: 18, height: 18)
+                .blur(radius: coreGlow * 0.3)
+                .offset(y: -5)
+            Circle()
+                .fill(Color.yellow)
+                .frame(width: 10, height: 10)
+                .offset(y: -5)
+
+            // 眼睛
+            HStack(spacing: 10) {
+                Circle().fill(Color.white).frame(width: 14, height: 14)
+                    .overlay(Circle().fill(Color.orange).frame(width: 8, height: 8))
+                Circle().fill(Color.white).frame(width: 14, height: 14)
+                    .overlay(Circle().fill(Color.orange).frame(width: 8, height: 8))
+            }.offset(y: -58)
+        }
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                coreGlow = 16
+            }
+        }
+    }
+}
+
+// MARK: - 渡劫境：劫雷龙
+struct StormDragonShape: View {
+    let mood: PetMood
+    @State private var boltOpacity: Double = 0
+    @State private var boltRotation: Double = 0
+
+    var body: some View {
+        ZStack {
+            // 电弧背景光
+            Circle()
+                .fill(Color(red:0.3,green:0.0,blue:0.6).opacity(0.3))
+                .frame(width: 130, height: 130)
+                .blur(radius: 10)
+
+            // 翅膀（闪电纹）
+            WingShape().fill(Color(red:0.4,green:0.0,blue:0.8).opacity(0.85))
+                .frame(width: 65, height: 52)
+                .offset(x: -57, y: -8)
+                .rotationEffect(.degrees(-22), anchor: .trailing)
+                .overlay(
+                    WingShape().stroke(Color.cyan.opacity(0.7), lineWidth: 1.5)
+                        .frame(width: 65, height: 52)
+                        .offset(x: -57, y: -8)
+                        .rotationEffect(.degrees(-22), anchor: .trailing)
+                )
+            WingShape().fill(Color(red:0.4,green:0.0,blue:0.8).opacity(0.85))
+                .frame(width: 65, height: 52)
+                .offset(x: 57, y: -8)
+                .scaleEffect(x: -1)
+                .rotationEffect(.degrees(22), anchor: .leading)
+
+            // 身体
+            Ellipse()
+                .fill(LinearGradient(colors: [Color(red:0.3,green:0.0,blue:0.7), Color(red:0.15,green:0.0,blue:0.4)], startPoint: .top, endPoint: .bottom))
+                .frame(width: 74, height: 90)
+            Circle()
+                .fill(LinearGradient(colors: [Color(red:0.3,green:0.0,blue:0.7), Color(red:0.15,green:0.0,blue:0.4)], startPoint: .top, endPoint: .bottom))
+                .frame(width: 58, height: 58)
+                .offset(y: -58)
+
+            // 电弧纹路
+            Path { p in
+                p.move(to: CGPoint(x: -10, y: -20))
+                p.addLine(to: CGPoint(x: 5, y: 0))
+                p.addLine(to: CGPoint(x: -5, y: 5))
+                p.addLine(to: CGPoint(x: 10, y: 25))
+            }
+            .stroke(Color.cyan, lineWidth: 1.5)
+            .opacity(boltOpacity)
+
+            // 眼睛（竖瞳）
+            HStack(spacing: 12) {
+                Capsule()
+                    .fill(Color.white).frame(width: 12, height: 16)
+                    .overlay(Capsule().fill(Color.cyan).frame(width: 5, height: 10))
+                Capsule()
+                    .fill(Color.white).frame(width: 12, height: 16)
+                    .overlay(Capsule().fill(Color.cyan).frame(width: 5, height: 10))
+            }.offset(y: -60)
+        }
+        .onAppear {
+            // 随机闪烁电弧
+            Timer.scheduledTimer(withTimeInterval: 1.5, repeats: true) { _ in
+                withAnimation(.easeIn(duration: 0.05)) { boltOpacity = 1 }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                    withAnimation(.easeOut(duration: 0.3)) { boltOpacity = 0 }
+                }
+            }
+        }
+    }
+}
+
 #Preview {
     VStack(spacing: 20) {
-        DragonView(form: .egg,       mood: .happy,   isWorkingOut: false)
-        DragonView(form: .hatchling, mood: .neutral, isWorkingOut: false)
-        DragonView(form: .young,     mood: .sad,     isWorkingOut: true)
-        DragonView(form: .divine,    mood: .happy,   isWorkingOut: false)
+        DragonView(form: .dormantEgg,   mood: .happy,   isWorkingOut: false)
+        DragonView(form: .hatchling,    mood: .neutral, isWorkingOut: false)
+        DragonView(form: .coreDragon,   mood: .ecstatic,isWorkingOut: false)
+        DragonView(form: .stormDragon,  mood: .happy,   isWorkingOut: true)
+        DragonView(form: .celestial,    mood: .happy,   isWorkingOut: false)
     }
     .padding()
     .background(Color.black)
