@@ -80,31 +80,32 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 24) {
-                    DragonView(form: dragonForm, mood: mood, isWorkingOut: false)
-                        .padding(.top, 20)
+                VStack(spacing: 12) {
+                    // 小龙 + 状态信息横排
+                    HStack(alignment: .center, spacing: 16) {
+                        DragonView(form: dragonForm, mood: mood, isWorkingOut: false)
+                            .frame(width: 100, height: 100)
+                            .scaleEffect(0.65)
 
-                    VStack(spacing: 4) {
-                        Text("境界 \(PetGrowthService.realm(for: petState.currentLevel)) · 第 \(PetGrowthService.levelInRealm(for: petState.currentLevel)) 级")
-                            .font(.headline)
-                        Text("连续打卡 \(petState.streakDays) 天")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    VStack(spacing: 8) {
-                        HStack {
-                            Text("今日完成")
-                            Spacer()
-                            Text("\(Int(completionRate * 100))%")
-                                .bold()
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("境界 \(PetGrowthService.realm(for: petState.currentLevel)) · 第 \(PetGrowthService.levelInRealm(for: petState.currentLevel)) 级")
+                                .font(.headline)
+                            Text("连续打卡 \(petState.streakDays) 天")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                            ProgressView(value: completionRate)
+                                .tint(completionRate >= 0.8 ? .green : .blue)
+                            Text("今日完成 \(Int(completionRate * 100))%")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
-                        ProgressView(value: completionRate)
-                            .tint(completionRate >= 0.8 ? .green : .blue)
+                        Spacer()
                     }
                     .padding(.horizontal)
+                    .padding(.top, 8)
 
-                    VStack(alignment: .leading, spacing: 8) {
+                    // 今日计划
+                    VStack(alignment: .leading, spacing: 6) {
                         Text("今日计划")
                             .font(.headline)
                             .padding(.horizontal)
@@ -112,28 +113,29 @@ struct HomeView: View {
                             .padding(.horizontal)
                     }
 
-                    Button(action: { showWorkout = true }) {
-                        Label("开始运动", systemImage: "figure.run")
-                            .font(.title3.bold())
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.blue)
-                            .foregroundStyle(.white)
-                            .cornerRadius(16)
+                    // 按钮区
+                    HStack(spacing: 12) {
+                        Button(action: { showWorkout = true }) {
+                            Label("开始运动", systemImage: "figure.run")
+                                .font(.subheadline.bold())
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .background(Color.blue)
+                                .foregroundStyle(.white)
+                                .cornerRadius(14)
+                        }
+                        Button(action: { showChat = true }) {
+                            Label("和小火说话", systemImage: "bubble.left.fill")
+                                .font(.subheadline.bold())
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .background(Color.orange)
+                                .foregroundStyle(.white)
+                                .cornerRadius(14)
+                        }
                     }
                     .padding(.horizontal)
-
-                    Button(action: { showChat = true }) {
-                        Label("和小火说话", systemImage: "bubble.left.and.bubble.right.fill")
-                            .font(.title3.bold())
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.orange)
-                            .foregroundStyle(.white)
-                            .cornerRadius(16)
-                    }
-                    .padding(.horizontal)
-                    .padding(.bottom, 20)
+                    .padding(.bottom, 12)
                 }
             }
             .navigationTitle("FitPet")
