@@ -113,15 +113,15 @@ struct EggShape: View {
 
     private var baseGradient: LinearGradient {
         switch mood {
-        case .happy:
+        case .ecstatic, .happy:
             return LinearGradient(
                 colors: [Color(red:0.2,green:0.9,blue:0.6), Color(red:0.0,green:0.6,blue:0.8), Color(red:0.4,green:0.2,blue:0.9)],
                 startPoint: .topLeading, endPoint: .bottomTrailing)
-        case .neutral:
+        case .content, .neutral:
             return LinearGradient(
                 colors: [Color(red:0.4,green:0.5,blue:1.0), Color(red:0.2,green:0.3,blue:0.8), Color(red:0.6,green:0.3,blue:0.9)],
                 startPoint: .topLeading, endPoint: .bottomTrailing)
-        case .sad:
+        default:
             return LinearGradient(
                 colors: [Color(red:0.5,green:0.5,blue:0.6), Color(red:0.3,green:0.3,blue:0.4)],
                 startPoint: .top, endPoint: .bottom)
@@ -130,17 +130,17 @@ struct EggShape: View {
 
     private var scaleColors: [Color] {
         switch mood {
-        case .happy:   return [.cyan, .green, .teal]
-        case .neutral: return [.blue, .purple, .indigo]
-        case .sad:     return [.gray, .gray.opacity(0.5)]
+        case .ecstatic, .happy: return [.cyan, .green, .teal]
+        case .content, .neutral: return [.blue, .purple, .indigo]
+        default: return [.gray, .gray.opacity(0.5)]
         }
     }
 
     private var eyeColor: Color {
         switch mood {
-        case .happy:   return .green
-        case .neutral: return .blue
-        case .sad:     return .gray
+        case .ecstatic, .happy: return .green
+        case .content, .neutral: return .blue
+        default: return .gray
         }
     }
 }
@@ -214,9 +214,12 @@ struct HatchlingShape: View {
 
     private var bodyGradient: LinearGradient {
         switch mood {
-        case .happy:   return LinearGradient(colors: [Color(red:0.2,green:0.8,blue:0.4), Color(red:0.1,green:0.6,blue:0.3)], startPoint: .top, endPoint: .bottom)
-        case .neutral: return LinearGradient(colors: [Color(red:0.3,green:0.5,blue:0.9), Color(red:0.2,green:0.3,blue:0.7)], startPoint: .top, endPoint: .bottom)
-        case .sad:     return LinearGradient(colors: [.gray, .gray.opacity(0.7)], startPoint: .top, endPoint: .bottom)
+        case .ecstatic, .happy:
+            return LinearGradient(colors: [Color(red:0.2,green:0.8,blue:0.4), Color(red:0.1,green:0.6,blue:0.3)], startPoint: .top, endPoint: .bottom)
+        case .content, .neutral:
+            return LinearGradient(colors: [Color(red:0.3,green:0.5,blue:0.9), Color(red:0.2,green:0.3,blue:0.7)], startPoint: .top, endPoint: .bottom)
+        default:
+            return LinearGradient(colors: [.gray, .gray.opacity(0.7)], startPoint: .top, endPoint: .bottom)
         }
     }
 }
