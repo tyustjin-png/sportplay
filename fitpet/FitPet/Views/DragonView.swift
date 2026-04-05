@@ -179,7 +179,6 @@ struct EggScalePattern: View {
         }
     }
 }
-}
 
 struct HatchlingShape: View {
     let mood: PetMood
