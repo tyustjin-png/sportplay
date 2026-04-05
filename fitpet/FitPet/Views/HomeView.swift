@@ -9,6 +9,7 @@ struct HomeView: View {
     @Query private var summaries: [DailySummary]
 
     @State private var showWorkout = false
+    @State private var showChat = false
 
     private var today: String { WorkoutService.today }
 
@@ -120,6 +121,17 @@ struct HomeView: View {
                             .cornerRadius(16)
                     }
                     .padding(.horizontal)
+
+                    Button(action: { showChat = true }) {
+                        Label("和小火说话", systemImage: "bubble.left.and.bubble.right.fill")
+                            .font(.title3.bold())
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.orange)
+                            .foregroundStyle(.white)
+                            .cornerRadius(16)
+                    }
+                    .padding(.horizontal)
                     .padding(.bottom, 20)
                 }
             }
@@ -127,6 +139,9 @@ struct HomeView: View {
         }
         .fullScreenCover(isPresented: $showWorkout, onDismiss: updatePetAfterWorkout) {
             WorkoutView()
+        }
+        .sheet(isPresented: $showChat) {
+            DragonChatView()
         }
         .onAppear {
             if plans.isEmpty { WorkoutService.seedDefaultPlans(context: context) }

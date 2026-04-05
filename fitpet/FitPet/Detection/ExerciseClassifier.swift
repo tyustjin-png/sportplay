@@ -61,16 +61,23 @@ struct ExerciseClassifier {
 
     private func bodyOrientation(_ lm: [String: (point: CGPoint, confidence: Float)]) -> BodyOrientation {
         guard
-            let ls = lm["leftShoulder"],  ls.confidence >= minVisibility,
-            let lh = lm["leftHip"],       lh.confidence >= minVisibility,
-            let la = lm["leftAnkle"],     la.confidence >= minVisibility
+            let ls = lm["leftShoulder"], ls.confidence >= minVisibility,
+            let lh = lm["leftHip"],      lh.confidence >= minVisibility
         else { return .unknown }
 
         let shoulderToHip = Double(lh.point.y - ls.point.y)
-        let hipToAnkle    = Double(la.point.y - lh.point.y)
 
-        if shoulderToHip > 0.1 && hipToAnkle > 0.1 { return .upright }
+        // 肩膀明显高于髋部 → 直立
+        if shoulderToHip > 0.1 {
+            // 用膝盖辅助确认（踝关节可能不在画面内）
+            if let lk = lm["leftKnee"], lk.confidence >= minVisibility {
+                let hipToKnee = Double(lk.point.y - lh.point.y)
+                if hipToKnee > 0.05 { return .upright }
+            }
+            return .upright
+        }
 
+        // 肩髋近乎水平 → 俯卧或仰卧
         if abs(shoulderToHip) < 0.1 {
             if let nose = lm["nose"], nose.confidence >= minVisibility {
                 return nose.point.y > ls.point.y ? .supine : .prone
@@ -83,16 +90,22 @@ struct ExerciseClassifier {
 
     private func isKneeFlexing(_ lm: [String: (point: CGPoint, confidence: Float)]) -> Bool {
         guard
-            let lh = lm["leftHip"],   lh.confidence >= minVisibility,
-            let lk = lm["leftKnee"],  lk.confidence >= minVisibility,
-            let la = lm["leftAnkle"], la.confidence >= minVisibility
+            let lh = lm["leftHip"],  lh.confidence >= minVisibility,
+            let lk = lm["leftKnee"], lk.confidence >= minVisibility
         else { return false }
-        let angle = calcAngle(lh.point, lk.point, la.point)
-        return angle < 150
+
+        // 有踝关节时用角度判断，否则用髋-膝垂直距离比例判断
+        if let la = lm["leftAnkle"], la.confidence >= minVisibility {
+            let angle = calcAngle(lh.point, lk.point, la.point)
+            return angle < 150
+        }
+        // 深蹲时膝盖明显低于髋部，且髋-膝距离缩短（弯曲时投影变小）
+        let hipKneeY = Double(lk.point.y - lh.point.y)
+        return hipKneeY < 0.15
     }
 
     private func hasMinimumLandmarks(_ lm: [String: (point: CGPoint, confidence: Float)]) -> Bool {
-        let required = ["leftShoulder", "leftHip", "leftAnkle"]
+        let required = ["leftShoulder", "leftHip"]
         return required.allSatisfy { key in
             (lm[key]?.confidence ?? 0) >= minVisibility
         }
