@@ -10,6 +10,7 @@ struct HomeView: View {
 
     @State private var showWorkout = false
     @State private var showChat = false
+    @State private var showSettings = false
 
     private var today: String { WorkoutService.today }
 
@@ -136,12 +137,22 @@ struct HomeView: View {
                 }
             }
             .navigationTitle("FitPet")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: { showSettings = true }) {
+                        Image(systemName: "gearshape")
+                    }
+                }
+            }
         }
         .fullScreenCover(isPresented: $showWorkout, onDismiss: updatePetAfterWorkout) {
             WorkoutView()
         }
         .sheet(isPresented: $showChat) {
             DragonChatView()
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsView()
         }
         .onAppear {
             if plans.isEmpty { WorkoutService.seedDefaultPlans(context: context) }
