@@ -24,15 +24,18 @@ struct GeminiService {
         let systemPrompt = buildSystemPrompt(level: petLevel, realm: petRealm, streak: streakDays)
         let body: [String: Any] = [
             "system_instruction": [
-                "parts": [["text": systemPrompt]]
-            ],
+                "parts": [["text": systemPrompt] as [String: Any]]
+            ] as [String: Any],
             "contents": [
-                ["role": "user", "parts": [["text": userMessage]]]
+                [
+                    "role": "user",
+                    "parts": [["text": userMessage] as [String: Any]]
+                ] as [String: Any]
             ],
             "generationConfig": [
                 "temperature": 0.9,
                 "maxOutputTokens": 512
-            ]
+            ] as [String: Any]
         ]
 
         var request = URLRequest(url: URL(string: endpoint)!)
